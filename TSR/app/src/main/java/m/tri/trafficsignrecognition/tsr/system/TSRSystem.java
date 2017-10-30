@@ -17,6 +17,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import m.tri.trafficsignrecognition.MainActivity;
+import m.tri.trafficsignrecognition.tsr.surf.Surf;
 
 /**
  * Created by evitorsi on 10/27/2017.
@@ -138,7 +139,7 @@ public class TSRSystem {
 
         System.out.println("RectangleData.getCount() = " + RectangleData.getCount());
 
-        for(int i = 1; i < RectangleData.getCount(); i++)
+        for(int i = 0 ; i < RectangleData.getCount(); i++)
         {
             if(((rectangle[i].xMax - rectangle[i].xMin) > 25) && ((rectangle[i].yMax - rectangle[i].yMin) > 25))
             {
@@ -682,7 +683,10 @@ public class TSRSystem {
      *******************************************************************************/
     public void recognizeSignWithinRIO(RectangleData[] roi)
     {
-        for(int r = 1; r < RectangleData.count; r++)
+        // Usefull for ploting the interest points (features)
+        Surf.resetCount();
+
+        for(int r = 0; r < RectangleData.getCount(); r++)
         {
             int roiWidth = roi[r].xMax-roi[r].xMin + 1;
             int roiHeight = roi[r].yMax - roi[r].yMin +1;
@@ -708,13 +712,27 @@ public class TSRSystem {
                 }
             }
 
-            // DEBUG: Save the region of interest as bmp
-            savePixelArrayAsBmp(new File("storage/sdcard1/TCC-TSR-2017/SURF implementation/ROI_" + r + ".png"), roiPixels, roiWidth, roiHeight);
-
+            // Resize the region of interest
             roiResizedPixels = resizeROI(roiPixels,roiWidth,roiHeight,100,100);
 
-            // DEBUG: Save the region of interest as bmp
-            savePixelArrayAsBmp(new File("storage/sdcard1/TCC-TSR-2017/SURF implementation/ROI_SCALED" + r + ".png"), roiResizedPixels, 100, 100);
+            // Extract features from the region of interest
+            Surf roiSurfObj = new Surf();
+            roiSurfObj.extractFeatures(roiPixels,roiWidth,roiHeight);
+            //roiSurfObj.extractFeatures(roiResizedPixels,100,100);
+
+//            // DEBUG: Save the region of interest as bmp
+//            savePixelArrayAsBmp(new File("storage/sdcard1/TCC-TSR-2017/SURF implementation/ROI_" + r + ".png"), roiPixels, roiWidth, roiHeight);
+//
+//            roiResizedPixels = resizeROI(roiPixels,roiWidth,roiHeight,100,100);
+//
+//            // DEBUG: Save the region of interest as bmp
+//            savePixelArrayAsBmp(new File("storage/sdcard1/TCC-TSR-2017/SURF implementation/ROI_SCALED" + r + ".png"), roiResizedPixels, 100, 100);
+
+
+
+
+//            // DEBUG: FOR NOW, IT STOPS AT THE FIRST ROI
+//            return;
         }
     }
 

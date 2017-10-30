@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mContext = this;
 
-        String sdCardPath = "storage/sdcard1/TCC-TSR-2017/SURF implementation/pare6.bmp";
+        String sdCardPath = "storage/sdcard1/TCC-TSR-2017/SURF implementation/de_preferencia_1.bmp";
         f = new File(sdCardPath);
 
         // Find the interest regions
@@ -103,8 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Find interest regions", "Execution time: " + (endnow - startnow) + " ms");
                 System.out.println("Done");
 
-                tsrSystem.recognizeSignWithinRIO(interestRegions);
-
+//
 //                System.out.print("Save input frame img...");
 //                startnow = android.os.SystemClock.uptimeMillis();
 //                tsrSystem.saveInputFramePixelsAsBmp();
@@ -139,6 +138,13 @@ public class MainActivity extends AppCompatActivity {
 //                endnow = android.os.SystemClock.uptimeMillis();
 //                Log.d("Save interest img", "Execution time: " + (endnow - startnow) + " ms");
 //                System.out.println("Done");
+
+                System.out.print("Aplying SURF...");
+                startnow = android.os.SystemClock.uptimeMillis();
+                tsrSystem.recognizeSignWithinRIO(interestRegions);
+                endnow = android.os.SystemClock.uptimeMillis();
+                Log.d("SURF execution", "Execution time: " + (endnow - startnow) + " ms");
+                System.out.println("Done");
 
                 //Intent intent = new Intent(mContext, PhotoDetectActivity.class);
                 //startActivity(intent);

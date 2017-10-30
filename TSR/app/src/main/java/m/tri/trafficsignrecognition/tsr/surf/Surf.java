@@ -37,8 +37,8 @@ public class Surf {
     // Store the height of the image
     int imgHeight = 0;
 
-    // Store the reference to the input image
-    Bitmap inputImage;
+    // Store the pixels of the input image
+    int[] inputImage;
 
     // Store the reference to the gray scale image
     ImgMatrixFormat grayImage;
@@ -77,7 +77,16 @@ public class Surf {
 
     PhotoDetectActivity photoDetectActivity;
 
-    public Surf(PhotoDetectActivity photoDetectActivity, Bitmap inputImage) {
+    // Number of time that SURF has been running in a row
+    static int count = 0;
+
+
+    public Surf()
+    {
+
+    }
+
+    public void extractFeatures(int[] inputImage, int imgWidth, int imgHeight) {
 
         TimingLogger timings = new TimingLogger("SurfExecutionTimeTag", "methodA");
 
@@ -87,8 +96,8 @@ public class Surf {
         this.inputImage = inputImage;
 
         // Size of target image
-        imgWidth = inputImage.getWidth();
-        imgHeight = inputImage.getHeight();
+        this.imgWidth = imgWidth;
+        this.imgHeight = imgHeight;
 
         // Gray image object
         grayImage = new ImgMatrixFormat(imgWidth,imgHeight);
@@ -114,8 +123,7 @@ public class Surf {
 
         // Plot the interest points over the image.
         timings.addSplit("Plot points");
-        //Surf_plotIpts();
-
+        Surf_plotIpts();
 
         /*
         for(int p = 0; p < 64; p++)
@@ -140,6 +148,9 @@ public class Surf {
 //
 //        tsrSystem.findInterestRegions(bmpSD);
 //
+
+        count++;
+
         timings.dumpToLog();
     }
 
@@ -155,7 +166,7 @@ public class Surf {
     private int InputImage_getPixel(int x,int y,int channel)
     {
         // Get the color components from the original image
-        int pixelColor = inputImage.getPixel(x, y);
+        int pixelColor = inputImage[x + y*imgWidth];
 
         int red = (pixelColor >> 16) & 0xff;
         int green = (pixelColor >>  8) & 0xff;
@@ -1244,25 +1255,41 @@ public class Surf {
      *******************************************************************************/
     void Surf_plotIpts()
     {
-        int i;
-
         Canvas canvas;
 
-        Bitmap imageWithIpts = Bitmap.createBitmap(inputImage.getWidth(), inputImage.getHeight(), inputImage.getConfig());
+        Bitmap imageWithIpts = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(imageWithIpts);
         Paint paint = new Paint();
-        canvas.drawBitmap(inputImage, new Matrix(), null);
+
+        for(int j = 0; j < imgHeight; j++ )
+        {
+            for(int i = 0; i < imgWidth; i++)
+            {
+                imageWithIpts.setPixel(i,j,inputImage[i+j*imgWidth]);
+            }
+        }
+
+        canvas.setBitmap(imageWithIpts);
+
         paint.setColor(Color.GREEN);
         paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
 
-        for(i = 0; i < np; i++)
+        for(int i = 0; i < np; i++)
         {
             canvas.drawCircle((int)ipts[i].x, (int)ipts[i].y, 2, paint);
         }
 
-        this.photoDetectActivity.showImg(imageWithIpts);
+        TSRSystem.saveBmp(new File("storage/sdcard1/TCC-TSR-2017/SURF implementation/Features_ROI_"+ count + ".png"),imageWithIpts);
+    }
 
-        //image.save_image("C://Users//evitorsi//Desktop//SURF_TESTE//Implementation of interest point only//InterestPoints.bmp");
+    /*******************************************************************************
+     * Function Name  : resetCount()
+     * Description    : Reset the surf counter that indicates the number of execution
+     *                  in a row.
+     *******************************************************************************/
+    static public void resetCount()
+    {
+        count = 0;
     }
 }
